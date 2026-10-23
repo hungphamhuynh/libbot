@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIBBOT - Sơ Đồ Luồng Kỹ Thuật Ứng Dụng Android</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Mermaid.js for beautiful diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.mermaid) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'neutral',
+          themeVariables: {
+            primaryColor: '#e0e7ff',
+            primaryTextColor: '#1e1b4b',
+            primaryBorderColor: '#6366f1',
+            lineColor: '#4f46e5',
+            secondaryColor: '#e0f2fe',
+            tertiaryColor: '#f1f5f9'
+          }
+        });
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --primary: #4338ca;
+      --primary-light: #6366f1;
+      --primary-soft: #e0e7ff;
+      --secondary: #0284c7;
+      --secondary-soft: #e0f2fe;
+      --accent: #059669;
+      --accent-soft: #d1fae5;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --dark: #0f172a;
+      --gray: #64748b;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      color: var(--dark);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    code,
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      color: white;
+      padding: 38px 20px 80px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    .nav-container {
+      max-width: 860px;
+      margin: -36px auto 32px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .tab-bar {
+      display: flex;
+      background: white;
+      padding: 6px;
+      border-radius: 50px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 13px 18px;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gray);
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--light-bg);
+      color: var(--dark);
+    }
+
+    /* Content Area */
+    .content-area {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--dark);
+    }
+
+    .card-title .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    /* Grid */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .tech-pill {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+
+    .tech-pill:hover {
+      border-color: var(--primary-light);
+    }
+
+    .tech-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tech-desc {
+      font-size: 0.84rem;
+      color: var(--gray);
+      line-height: 1.45;
+    }
+
+    /* Code Container */
+    .code-container {
+      background: var(--code-bg);
+      border-radius: var(--radius-md);
+      margin: 12px 0;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+
+    .code-header {
+      background: #0f172a;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      border-bottom: 1px solid #334155;
+    }
+
+    .code-body {
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.7;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: pre;
+      tab-size: 2;
+    }
+
+    .code-body .keyword {
+      color: #f472b6;
+      font-weight: 600;
+    }
+
+    .code-body .function {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .code-body .string {
+      color: #34d399;
+    }
+
+    .code-body .comment {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .code-body .number {
+      color: #fbbf24;
+    }
+
+    /* File Tree Box */
+    .tree-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      line-height: 1.7;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tree-desc {
+      color: var(--gray);
+      font-size: 0.8rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-left: 8px;
+    }
+
+    /* 2 Layers Technical Layout */
+    .layers-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .layer-box {
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      border: 2px solid;
+    }
+
+    .layer-app {
+      background: #faf5ff;
+      border-color: #c084fc;
+    }
+
+    .layer-cloud {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+
+    .layer-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .layer-title-text {
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .layer-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+
+    .layer-bus {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: white;
+      border: 1px dashed #94a3b8;
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      width: fit-content;
+      margin: -8px auto;
+      z-index: 2;
+    }
+
+    /* Flow Technical Accordion */
+    .flow-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 18px;
+      background: white;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flow-head {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.05rem;
+      background: #ffffff;
+      transition: background 0.2s;
+    }
+
+    .flow-head:hover {
+      background: #f8fafc;
+    }
+
+    .flow-card.open .flow-head {
+      background: #eef2ff;
+      color: var(--primary);
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    .flow-content {
+      padding: 22px;
+      display: none;
+      background: #fafafa;
+    }
+
+    .flow-card.open .flow-content {
+      display: block;
+    }
+
+    /* Sơ đồ trực quan Box */
+    .diagram-wrapper {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin: 16px 0;
+      overflow-x: auto;
+      text-align: center;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .diagram-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #6366f1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Step Sequence Boxes (Offline Visual Fallback) */
+    .visual-sequence {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .seq-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      position: relative;
+    }
+
+    .seq-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .seq-body {
+      flex: 1;
+      font-size: 0.88rem;
+    }
+
+    .seq-title {
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+
+    .seq-desc {
+      color: #475569;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.86rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+
+    .data-table td code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+
+    .highlight-tip {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 14px;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      margin: 12px 0;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="badge-top">
+    </div>
+    <h1>TỔNG QUAN KỸ THUẬT & LƯU ĐỒ LUỒNG LIBBOT</h1>
+  </header>
+
+  <!-- Navigation Tab Bar -->
+  <div class="nav-container">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchPage('tab1', this)">
+        <span>📦 Trang 1: Tổng Quan & Codebase</span>
+      </button>
+      <button class="tab-btn" onclick="switchPage('tab2', this)">
+        <span>⚡ Trang 2: Kiến Trúc & Lưu Đồ (Flowcharts)</span>
+      </button>
+      <button class="tab-btn" onclick="switchPage('tab3', this)">
+        <span>🛡️ Trang 3: Quy Tắc Bảo Mật (Security Rules)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content-area">
+
+    <!-- ================================================================= -->
+    <!-- TRANG 1: TỔNG QUAN KỸ THUẬT & CODEBASE                           -->
+    <!-- ================================================================= -->
+    <div id="tab1" class="page active">
+
+      <!-- 1. Bộ công cụ và công nghệ nền tảng -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #e0e7ff; color: #4338ca;">🛠️</div>
+          <div>
+            <div>1. Công Nghệ Nền Tảng</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Các thư viện và phiên bản thực tế cấu
+              hình trong build.gradle.kts</div>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="tech-pill">
+            <div class="tech-name"><span>🌐</span> Kotlin 2.2.10</div>
+            <div class="tech-desc">Ngôn ngữ lập trình chính cho Android
+            </div>
+          </div>
+
+          <div class="tech-pill">
+            <div class="tech-name"><span>🎨</span> Jetpack Compose</div>
+            <div class="tech-desc">Bộ công cụ chính để code giao diện hoàn toàn bằng Kotlin,
+            </div>
+          </div>
+
+          <div class="tech-pill">
+            <div class="tech-name"><span>🏛️</span> Single Activity</div>
+            <div class="tech-desc">Chỉ có 1 Activity duy nhất (<code>MainActivity</code>), toàn bộ màn hình điều phối
+              qua biến trạng thái <code>currentScreen</code>.</div>
+          </div>
+
+          <div class="tech-pill">
+            <div class="tech-name"><span>🔥</span> Firebase SDK 34.19</div>
+            <div class="tech-desc">Bộ đôi <strong>Firebase Auth</strong> (xác thực an toàn) và <strong>Realtime
+                Database</strong> (cơ sở dữ liệu đám mây thời gian thực).</div>
+          </div>
+        </div>
+
+        <div class="highlight-tip">
+          Lưu ý: <strong>Thông số Android SDK:</strong> Biên dịch với <strong>compileSdk 37</strong>, hỗ trợ thiết bị từ
+          Android 10 (<strong>minSdk 29</strong>) trở lên, máy ảo <strong>Java 11</strong>.
+        </div>
+      </div>
+
+      <!-- 2. Cấu trúc thư mục mã nguồn -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background:x #e0f2fe; color: #0284c7;">📁</div>
+          <div>
+            <div>2. Bản Đồ Mã Nguồn & Phân Bổ File</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Tất cả mã nguồn ứng dụng nằm tại
+              com.example.libbot</div>
+          </div>
+        </div>
+
+        <div class="tree-box">
+          <div class="tree-item"><strong>📂 app/src/main/java/com/example/libbot/</strong></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>MainActivity.kt</strong> <span
+              class="tree-desc">➔ Trạm điều phối trung tâm (Router), kiểm tra vai trò ADMIN/USER</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>LoginScreen.kt</strong> <span
+              class="tree-desc">➔ Màn hình đăng nhập, validate form và dịch mã lỗi Firebase sang tiếng Việt</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>HomeScreen.kt</strong> <span
+              class="tree-desc">➔ Bảng điều khiển trung tâm dành cho Quản trị viên (ADMIN)</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>UserHomeScreen.kt</strong> <span
+              class="tree-desc">➔ Bảng điều khiển trung tâm dành cho Bạn đọc (USER)</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>BookManagementScreen.kt</strong> <span
+              class="tree-desc">➔ Quản lý kho sách, xếp ô tủ (slot), ra lệnh phần cứng cất/xóa sách</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>UserBooksScreen.kt</strong> <span
+              class="tree-desc">➔ Danh mục sách, quy trình mượn sách tự động kèm cơ chế Hoàn tác (Rollback)</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>UserHistoryScreen.kt</strong> <span
+              class="tree-desc">➔ Lịch sử cá nhân, đếm ngược 15s chờ quét Barcode và điều khiển trả sách</span></div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>UserManagementScreen.kt</strong> <span
+              class="tree-desc">➔ Quản lý tài khoản, áp dụng Secondary FirebaseApp để không cướp phiên Admin</span>
+          </div>
+          <div class="tree-item" style="padding-left: 20px;">├── 📄 <strong>AdminLoanHistoryScreen.kt</strong> <span
+              class="tree-desc">➔ Giám sát toàn bộ lượt mượn, thuật toán ghép dữ liệu (Join) đa tầng</span></div>
+          <div class="tree-item" style="padding-left: 20px;">└── 📂 <strong>ui/theme/</strong> (Color.kt, Theme.kt,
+            Type.kt) <span class="tree-desc">➔ Hệ thống thiết kế chuẩn Material 3</span></div>
+        </div>
+      </div>
+
+      <!-- 3. Cấu trúc dữ liệu Firebase Realtime Database -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #fef3c7; color: #d97706;">🗄️</div>
+          <div>
+            <div>3. Cấu Trúc Cơ Sở Dữ Liệu Thời Gian Thực (RTDB Schema)</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">5 nút dữ liệu phẳng (JSON Tree) vừa
+              lưu trữ vừa làm Event Bus điều khiển thiết bị</div>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Đường dẫn nút (Node)</th>
+              <th>Các trường dữ liệu (Fields)</th>
+              <th>Ý nghĩa trong ứng dụng Android</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/users/{uid}</code></td>
+              <td><code>name</code>, <code>email</code>, <code>role: "ADMIN" | "USER"</code></td>
+              <td>Lưu hồ sơ người dùng và phân quyền RBAC ngay sau khi đăng nhập.</td>
+            </tr>
+            <tr>
+              <td><code>/books/{bookId}</code></td>
+              <td><code>title</code>, <code>author</code>, <code>category</code>, <code>status</code>, <code>slot</code>
+              </td>
+              <td>Kho sách trong thư viện. <code>status</code> gồm "AVAILABLE" (có sẵn) hoặc "BORROWED" (đã mượn).
+                <code>slot</code> là vị trí ô tủ vật lý.
+              </td>
+            </tr>
+            <tr>
+              <td><code>/loans/{userId}/{loanId}</code></td>
+              <td><code>userId</code>, <code>bookId</code>, <code>slot</code>, <code>borrowDate</code>,
+                <code>returnDate</code>
+              </td>
+              <td>Lịch sử mượn trả sách, đánh chỉ mục theo <code>userId</code> giúp độc giả tra cứu siêu tốc.</td>
+            </tr>
+            <tr>
+              <td><code>/stations</code></td>
+              <td><code>currentLoanId</code>, <code>mode: "BORROW" | "RETURN"</code>, <code>slot</code>,
+                <code>status</code>
+              </td>
+              <td><strong>Kênh điều khiển máy trạm:</strong> App ghi lệnh (mode, slot), trạm máy IoT ngoài đời thực đọc
+                lệnh, chạy cơ cấu và báo <code>status = "SUCCESS"</code>.</td>
+            </tr>
+            <tr>
+              <td><code>/scan_event</code></td>
+              <td><code>code: String</code></td>
+              <td><strong>Kênh máy quét mã vạch:</strong> Máy quét phần cứng bắn mã vừa đọc được vào đây để App tự điền
+                vào form.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TRANG 2: KIẾN TRÚC 2 TẦNG & SƠ ĐỒ CÁC LUỒNG                      -->
+    <!-- ================================================================= -->
+    <div id="tab2" class="page">
+
+      <!-- 1. Chi tiết kiến trúc 2 tầng -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #e0e7ff; color: #4338ca;">⚡</div>
+          <div>
+            <div>1. Phân Tích Kiến Trúc 2 Tầng Chính</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Mô hình kết nối trực tiếp</div>
+          </div>
+        </div>
+
+        <div class="layers-layout">
+          <!-- Tầng 1: Android App -->
+          <div class="layer-box layer-app">
+            <div class="layer-title-bar">
+              <div class="layer-title-text" style="color: #6b21a8;">
+                <span>📱 TẦNG 1: ỨNG DỤNG ANDROID (CLIENT LAYER)</span>
+              </div>
+              <span class="layer-tag" style="background: #e9d5ff; color: #581c87;">Giao diện & Logic</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #374151;">
+              - <strong>State Management (Quản lý trạng thái):</strong> Dùng
+              <code>remember { mutableStateOf(...) }</code>. Khi State thay đổi, Compose tự động
+              <strong>Recomposition</strong> để vẽ lại giao diện.<br>
+              - <strong>Side-Effects (Tác vụ phụ):</strong>
+              <br>&nbsp;&nbsp;• <code>LaunchedEffect(Unit)</code>: Tải dữ liệu Firebase 1 lần khi mở màn hình.
+              <br>&nbsp;&nbsp;• <code>LaunchedEffect(timer)</code>: Đếm ngược 15 giây chờ quét mã Barcode (Timeout).
+              <br>&nbsp;&nbsp;• <code>DisposableEffect</code>: Lắng nghe liên tục Firebase qua
+              <code>ValueEventListener</code> và tự hủy bằng <code>onDispose</code> khi đóng màn hình để chống rò rỉ bộ
+              nhớ (Memory Leak).
+            </p>
+          </div>
+
+          <!-- Cầu nối trung gian -->
+          <div class="layer-bus">
+            <span>🔌 Giao thức WebSocket thời gian thực - Độ trễ mili-giây</span>
+          </div>
+
+          <!-- Tầng 2: Firebase Cloud -->
+          <div class="layer-box layer-cloud">
+            <div class="layer-title-bar">
+              <div class="layer-title-text" style="color: #166534;">
+                <span>☁️ TẦNG 2: MÁY CHỦ ĐÁM MÂY (FIREBASE BACKEND)</span>
+              </div>
+              <span class="layer-tag" style="background: #bbf7d0; color: #14532d;">Dữ liệu & Trung chuyển</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #374151;">
+              - <strong>Firebase Authentication:</strong> Đóng vai trò Cổng bảo mật (Identity Provider), mã hóa băm mật
+              khẩu chuẩn.<br>
+              - <strong>Firebase Realtime Database:</strong> Cơ sở dữ liệu NoSQL JSON đồng bộ WebSocket, đóng vai trò
+              <strong>Message Broker (Bộ trung chuyển lệnh)</strong> hai chiều giữa App Android và Vi điều khiển máy
+              trạm cơ khí IoT.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Sơ Đồ Kỹ Thuật Từng Luồng Nghiệp Vụ -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #fef3c7; color: #d97706;">📊</div>
+          <div>
+            <div>2. Lưu Đồ Thuật Toán & Hành Vi Từng Luồng (Flowcharts)</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Lưu đồ hình khối trực quan nối từ trên xuống dưới, mô tả hành vi bằng ngôn ngữ thông dụng (100% không dùng sơ đồ tuần tự)</div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 1 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>🔐 LUỒNG 1: Đăng Nhập & Phân Quyền (Login & Role Routing)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Xác thực danh tính & Định tuyến giao diện</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    A["👤 Người dùng nhập Email & Mật khẩu"] --> B["Bấm nút 'Đăng nhập' trên LoginScreen.kt"]
+    B --> C["Gọi Firebase Auth:<br>signInWithEmailAndPassword(email, pass)"]
+    
+    C --> D{"Firebase Auth xác thực thành công?"}
+    
+    D -->|THẤT BẠI| E["Bắt FirebaseAuthException:<br>Dịch mã lỗi sang tiếng Việt (getVietnameseAuthError)"]
+    E --> F["Hiển thị thông báo lỗi trên màn hình cho người dùng"]
+    
+    D -->|THÀNH CÔNG| G["Lấy UID người dùng:<br>val uid = authResult.user.uid"]
+    G --> H["Đọc một lần (.get()) từ RTDB:<br>/users/{uid}/role"]
+    
+    H --> I{"Kiểm tra giá trị role?"}
+    I -->|role == 'ADMIN'| J["Cập nhật currentScreen = 'HOME'<br>👉 Điều hướng tới HomeScreen (Quản trị viên)"]
+    I -->|role == 'USER'| K["Cập nhật currentScreen = 'HOME'<br>👉 Điều hướng tới UserHomeScreen (Bạn đọc)"]
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>1. Nhập thông tin:</strong> Người dùng nhập email và mật khẩu tại <a href="file:///P:/LIBBOT/app/src/main/java/com/example/libbot/LoginScreen.kt"><code>LoginScreen.kt</code></a> rồi nhấn nút "Đăng nhập".<br>
+              <strong>2. Bảo vệ cổng:</strong> Máy chủ Firebase Auth kiểm tra xem tài khoản và mật khẩu có đúng không. Nếu sai, ứng dụng dịch mã lỗi kỹ thuật thành tiếng Việt dễ hiểu để người dùng nhập lại.<br>
+              <strong>3. Tra cứu chức vụ:</strong> Nếu đăng nhập đúng, ứng dụng cầm mã số cá nhân tra vào sổ danh bạ <code>/users/{uid}/role</code> trên cơ sở dữ liệu để xem bạn là <strong>ADMIN</strong> hay <strong>USER</strong>.<br>
+              <strong>4. Đổi màn hình:</strong> Nếu là ADMIN thì nạp giao diện quản lý sách và người dùng; nếu là USER thì nạp giao diện tìm kiếm và mượn sách.
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 2 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>📦 LUỒNG 2: Mượn Sách & Cơ Chế Hoàn Tác (Two-Phase Commit & Rollback)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Kiểm tra 2 pha & Tự động hoàn tác Rollback khi sự cố</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    Start(["📖 Độc giả nhấn 'Mượn' trên UserBooksScreen.kt"]) --> Step1["1. Đọc lại books/{bookId}/status từ RTDB"]
+    
+    Step1 --> CheckStatus{"status == 'AVAILABLE'?"}
+    CheckStatus -->|KHÔNG| Abort1["Thông báo: Sách vừa được người khác mượn<br>👉 Tải lại danh sách (loadBooks)"]
+    
+    CheckStatus -->|CÒN SẴN| Step2["2. Sinh mã ngẫu nhiên duy nhất: UUID loanId"]
+    Step2 --> Step3["3. Ghi lệnh tới /stations:<br>mode: 'BORROW', slot: book.slot, currentLoanId: loanId, status: 'PENDING'"]
+    
+    Step3 --> Step4["4. DisposableEffect lắng nghe /stations/status == 'SUCCESS'"]
+    Step4 --> CheckMatch{"currentLoanId trùng khớp với loanId?"}
+    CheckMatch -->|Đang chạy hoặc khác ID| WaitStation["Tiếp tục chờ máy cơ khí di chuyển"]
+    
+    CheckMatch -->|Khớp & SUCCESS| Step5["5. Ghi phiếu mượn vào /loans/{userId}/{loanId}"]
+    Step5 --> Step6["6. Cập nhật /books/{bookId}/status = 'BORROWED'"]
+    
+    Step6 --> CheckCommit{"Ghi trạng thái sách thành công?"}
+    CheckCommit -->|THÀNH CÔNG| Success(["✅ Hoàn tất: Máy nhả sách + Tải lại kho sách"])
+    CheckCommit -->|THẤT BẠI| Rollback["🛡️ KÍCH HOẠT HOÀN TÁC ROLLBACK:<br>loansRef.child(loanId).removeValue()<br>👉 Xóa ngay phiếu mượn để không bị trừ sách oan!"]
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>1. Kiểm tra lại kho:</strong> Khi bạn đọc nhấn "Mượn", App kiểm tra nhanh trạng thái cuốn sách trên Firebase xem có vừa bị ai mượn trước không.<br>
+              <strong>2. Ra lệnh cho Robot:</strong> App ghi lệnh xuống <code>/stations</code> yêu cầu mở ô tủ tương ứng và đẩy sách ra cho bạn đọc.<br>
+              <strong>3. Chờ Robot xác nhận:</strong> Robot cơ khí chạy động cơ, đẩy sách ra ngoài rồi báo cáo <code>status = SUCCESS</code>.<br>
+              <strong>4. Ghi sổ theo dõi:</strong> App lưu lượt mượn vào <code>/loans/{userId}</code> và đánh dấu cuốn sách là <code>BORROWED</code>.<br>
+              <strong>5. Tuyệt chiêu Rollback:</strong> Nếu lúc cập nhật kho sách bị đứt mạng hoặc mất điện, App kích hoạt ngay lệnh xóa lượt mượn vừa ghi, đảm bảo bạn đọc không bao giờ bị mang tiếng là "đang nợ sách" khi chưa nhận được sách!
+            </div>
+
+            <!-- Mô tả hành vi bảo vệ người dùng thay cho code phức tạp -->
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 16px; margin: 12px 0;">
+              <div style="font-weight: 800; font-size: 0.95rem; color: #166534; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                <span>🛡️ HÀNH VI TỰ ĐỘNG BẢO VỆ ĐỘC GIẢ (KỸ THUẬT ROLLBACK)</span>
+              </div>
+              <p style="font-size: 0.88rem; color: #1e293b; line-height: 1.6;">
+                <strong>• Sự cố xảy ra ngoài ý muốn:</strong> Robot bên ngoài đã đẩy sách ra rồi, nhưng đúng lúc đó đường truyền mạng Wifi/4G của điện thoại bị chập chờn, khiến ứng dụng không thể lưu trạng thái "Sách đã mượn" lên máy chủ.<br>
+                <strong>• Cách ứng dụng tự động xử lý:</strong> Thay vì để mặc lỗi làm sai lệch dữ liệu, ứng dụng sẽ tự động <em>xóa sạch phiếu mượn vừa tạo</em>, hủy bỏ mọi trạng thái chờ và gửi thông báo nhắc bạn đọc liên hệ thủ thư.<br>
+                <strong>• Ý nghĩa thiết thực:</strong> Tài khoản học sinh được hoàn trả về trạng thái bình thường, tránh tuyệt đối việc học sinh bị phạt hoặc bị ghi nợ một cuốn sách mà hệ thống chưa kịp ghi nhận hoàn tất!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 3 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>📥 LUỒNG 3: Trả Sách Bằng Barcode & Đồng Hồ Hẹn Giờ 15s (Scanning Timeout)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Quét mã vạch phần cứng an toàn có cơ chế Timeout</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    Start(["📦 Độc giả bấm 'Trả sách' trên UserHistoryScreen.kt"]) --> Init["Bật cờ showScanDialog = true<br>Reset biến scanResult = ''"]
+    
+    Init --> Fork1["Kích hoạt LaunchedEffect(timer):<br>Đếm ngược 15 giây (15s Timeout)"]
+    Init --> Fork2["Kích hoạt DisposableEffect lắng nghe /scan_event/code"]
+    
+    Fork1 --> TimerCheck{"Đã quá 15 giây mà chưa quét?"}
+    TimerCheck -->|HẾT 15 GIÂY| TimeoutAction["⏰ TIMEOUT: Tự động đóng Dialog, hủy phiên quét<br>Báo: 'Không tìm thấy mã sách, vui lòng thử lại'"]
+    
+    Fork2 --> ScanCheck{"Đầu đọc phần cứng ghi mã vào /scan_event?"}
+    ScanCheck -->|NHẬN ĐƯỢC MÃ| CancelTimer["Dừng bộ đếm ngược 15s ngay lập tức"]
+    CancelTimer --> ValidateLoan{"Mã sách quét được có khớp với sách đang mượn?"}
+    
+    ValidateLoan -->|KHÔNG KHỚP| ErrorScan["Báo lỗi: 'Mã sách không đúng với cuốn sách này!'"]
+    ValidateLoan -->|KHỚP SÁCH| ShowConfirm["Mở hộp thoại xác nhận trả sách cho bạn đọc"]
+    
+    ShowConfirm --> UserConfirm["Độc giả bấm 'Xác nhận trả'"]
+    UserConfirm --> SendStation["Ghi lệnh tới /stations:<br>mode: 'RETURN', slot: loan.slot, status: 'PENDING'"]
+    
+    SendStation --> ListenReturn["Chờ trạm cơ khí mở hộc tủ cất sách và báo status == 'SUCCESS'"]
+    ListenReturn --> CompleteReturn["1. Cập nhật returnDate trong /loans/{userId}/{loanId}<br>2. Cập nhật /books/{bookId}/status = 'AVAILABLE'<br>3. Xóa dữ liệu tạm /scan_event/code = ''"]
+    CompleteReturn --> SuccessReturn(["✅ Hoàn tất trả sách an toàn"])
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>1. Kích hoạt đếm ngược 15s:</strong> Bạn đọc bấm "Trả sách", ứng dụng bật một chiếc đồng hồ bấm giờ 15 giây và mở tai nghe chờ tín hiệu từ máy quét mã vạch.<br>
+              <strong>2. Bảo vệ chống treo máy (Timeout):</strong> Nếu bạn đọc để máy đó quá 15 giây mà không quét, ứng dụng tự động hủy phiên để không làm kẹt hệ thống máy trạm.<br>
+              <strong>3. Nhận diện mã vạch:</strong> Khi đưa gáy sách vào đầu đọc, máy quét tít một tiếng và bắn mã vào hệ thống. App kiểm tra xem bạn đọc có thực sự đang mượn cuốn này không.<br>
+              <strong>4. Robot cất sách:</strong> Bạn bấm "Xác nhận", Robot cơ khí tự động mở đúng ô hộc tủ để bạn cất sách vào.<br>
+              <strong>5. Hoàn tất:</strong> Robot báo cáo đã xong, App đóng dấu ngày giờ trả và đưa cuốn sách trở lại trạng thái "Có sẵn" cho các bạn khác mượn.
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 4 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>📚 LUỒNG 4: Quản Lý Kho Sách Thêm & Xóa Với Robot (Add / Delete Book with Station)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Điều phối cơ cấu cơ khí khi Quản trị viên nhập/xuất sách</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    Start(["Thủ thư thao tác trên BookManagementScreen.kt"]) --> Action{"Chọn thao tác quản lý kho"}
+    
+    Action -->|THÊM SÁCH MỚI| Add1["Thủ thư nhập Title, Author, Category và chọn ô Slot trống"]
+    Add1 --> Add2["Kiểm tra tính hợp lệ: ID chưa tồn tại & Slot chưa bị chiếm"]
+    Add2 --> Add3["Ghi lệnh điều khiển vào /stations:<br>mode: 'RETURN', slot: selectedSlot, status: 'PENDING'"]
+    Add3 --> Add4["Trạm cơ khí mở ngăn tủ Slot -> Thủ thư xếp sách vào"]
+    Add4 --> Add5["Trạm máy báo /stations/status == 'SUCCESS'"]
+    Add5 --> Add6["Ghi bản ghi sách mới vào /books/{bookId}"]
+    Add6 --> AddDone(["✅ Thêm sách mới vào kho thành công"])
+    
+    Action -->|XÓA SÁCH KHỎI KHO| Del1["Thủ thư bấm nút 'Xóa' sách tại ô tủ Slot"]
+    Del1 --> Del2["Ghi lệnh điều khiển vào /stations:<br>mode: 'BORROW', slot: book.slot, status: 'PENDING'"]
+    Del2 --> Del3["Trạm cơ khí đẩy cuốn sách ra ngoài trả cho thủ thư"]
+    Del3 --> Del4["Trạm máy báo /stations/status == 'SUCCESS'"]
+    Del4 --> Del5["Xóa bản ghi sách khỏi /books/{bookId}"]
+    Del5 --> DelDone(["✅ Xóa và thu hồi sách khỏi hệ thống thành công"])
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>• Khi THÊM sách mới:</strong> Thủ thư gõ thông tin và chọn ô tủ còn trống. App gửi lệnh điều khiển đến trạm máy. Cơ cấu robot sẽ mở ô tủ đó ra, thủ thư đặt sách vào, robot đóng lại và báo thành công. Lúc này sách mới chính thức được ghi vào cơ sở dữ liệu.<br>
+              <strong>• Khi XÓA sách:</strong> Thủ thư bấm nút xóa. App gửi lệnh đến trạm máy. Robot sẽ chạy tới ô tủ đó và đẩy cuốn sách ra ngoài để trả lại cho thủ thư. Sau khi robot báo đẩy xong, App mới xóa tên cuốn sách khỏi hệ thống.
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 5 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>👥 LUỒNG 5: Tạo Tài Khoản An Toàn Bằng Secondary FirebaseApp (Cách Ly Session)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Cách ly phiên làm việc phụ để chống cướp quyền Admin</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    Start(["Thủ thư nhập Name, Email, Password, Role trên UserManagementScreen.kt"]) --> Click["Bấm nút 'Tạo tài khoản'"]
+    
+    Click --> InitApp["Khởi tạo Secondary Instance độc lập:<br>FirebaseApp.initializeApp(context, options, 'LIBBOT_CREATE_USER')"]
+    InitApp --> GetAuth["Lấy FirebaseAuth riêng biệt:<br>val secondaryAuth = FirebaseAuth.getInstance(secondaryApp)"]
+    
+    GetAuth --> CreateAuth["Gọi secondaryAuth.createUserWithEmailAndPassword(...)"]
+    
+    CreateAuth --> CheckAuth{"Tạo Auth thành công?"}
+    CheckAuth -->|THẤT BẠI| ErrAuth["Bắt FirebaseAuthException -> Dịch lỗi tiếng Việt"]
+    
+    CheckAuth -->|THÀNH CÔNG| WriteDB["Lấy newUid = authResult.user.uid<br>Ghi hồ sơ vào RTDB: /users/{newUid}"]
+    
+    WriteDB --> CheckDB{"Ghi RTDB thành công?"}
+    CheckDB -->|THẤT BẠI| RollbackAuth["🛡️ HOÀN TÁC: secondaryAuth.currentUser?.delete()<br>Xóa tài khoản rác để bảo đảm toàn vẹn dữ liệu"]
+    
+    CheckDB -->|THÀNH CÔNG| CleanUp["Dọn dẹp phiên làm việc phụ:<br>1. secondaryAuth.signOut()<br>2. secondaryApp.delete()"]
+    CleanUp --> SecureState["🔒 Phiên đăng nhập Admin hiện tại (Firebase.auth) được bảo toàn 100%!"]
+    SecureState --> SuccessUser(["✅ Thông báo tạo người dùng thành công"])
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>• Vấn đề nan giải:</strong> Trong thư viện Firebase của Google, hễ gọi hàm tạo tài khoản mới là máy sẽ tự động đăng nhập luôn vào tài khoản học sinh vừa tạo, khiến thủ thư bị "đá văng" ra ngoài màn hình đăng nhập!<br>
+              <strong>• Giải pháp kỹ thuật thông minh:</strong> Ứng dụng tạo ra một "căn phòng phụ" độc lập có tên là <code>LIBBOT_CREATE_USER</code>. Mọi thao tác tạo nick học sinh diễn ra bên trong phòng phụ. Tạo xong, ứng dụng lưu thông tin vào cơ sở dữ liệu rồi xóa ngay căn phòng phụ này đi.<br>
+              <strong>• Kết quả:</strong> Tài khoản học sinh được tạo thành công mỹ mãn mà thủ thư vẫn ngồi yên trên ghế Admin của mình!
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LUỒNG 6 ================= -->
+        <div class="flow-card open">
+          <div class="flow-head" onclick="toggleFlow(this)">
+            <span>📊 LUỒNG 6: Giám Sát Toàn Bộ Lịch Sử & Ghép Dữ Liệu Đa Nguồn (Client-Side Join)</span>
+            <span>▼</span>
+          </div>
+          <div class="flow-content">
+            <div class="diagram-title">Lưu đồ thuật toán: Thuật toán ghép nối dữ liệu 3 bảng trực tiếp trên bộ nhớ RAM</div>
+
+            <div class="diagram-wrapper">
+              <pre class="mermaid">
+flowchart TD
+    Start(["Thủ thư mở AdminLoanHistoryScreen.kt"]) --> ReadLoans["1. LaunchedEffect(Unit) đọc toàn bộ nút /loans một lần (.get())"]
+    
+    ReadLoans --> LoopUsers["Duyệt qua danh sách từng userId trong DataSnapshot"]
+    LoopUsers --> LoopLoans["Duyệt qua từng loanId của mỗi học sinh"]
+    
+    LoopLoans --> ExtractRaw["Trích xuất: loanId, userId, bookId, slot, borrowDate, returnDate"]
+    ExtractRaw --> SortList["Sắp xếp theo borrowDate giảm dần (Mới nhất lên đầu)"]
+    SortList --> InstantUI["Hiển thị ngay danh sách sơ bộ lên giao diện (Không bị treo UI)"]
+    
+    InstantUI --> AsyncJoin["2. Chạy ngầm Coroutine bất đồng bộ để ghép thông tin (Client-Side Join):"]
+    AsyncJoin --> QueryUser["Đọc /users/{userId} -> Lấy tên (userName) và email (userEmail)"]
+    AsyncJoin --> QueryBook["Đọc /books/{bookId} -> Lấy tựa đề (bookTitle) và tác giả (bookAuthor)"]
+    
+    QueryUser --> MergeRecord["Ghép thành đối tượng hiển thị hoàn chỉnh: LoanHistoryItem"]
+    QueryBook --> MergeRecord
+    MergeRecord --> RecomposeUI["Compose tự động Recomposition cập nhật tên người & tên sách mượt mà"]
+              </pre>
+            </div>
+
+            <!-- Lời giải thích dễ hiểu -->
+            <div class="highlight-tip">
+              🗣️ <strong>Giải thích luồng bằng lời:</strong><br>
+              <strong>• Vấn đề:</strong> Cơ sở dữ liệu đám mây Firebase Realtime Database lưu dữ liệu ở 3 nơi riêng biệt: Bảng mượn sách chỉ có mã số, bảng người dùng có họ tên, bảng sách có tựa đề. Máy chủ không có lệnh ghép bảng sẵn như các hệ thống khác.<br>
+              <strong>• Giải pháp kỹ thuật:</strong> Ứng dụng Android tải toàn bộ lượt mượn về trước để hiện ngay lên màn hình trong tích tắc. Sau đó vi xử lý điện thoại chạy ngầm đọc thêm tên người và tên sách để ghép vào từng thẻ mượn. Nhờ vậy thủ thư nhìn vào là thấy đầy đủ: "Học sinh nào, mượn cuốn gì, ngày mấy, đã trả chưa" rất rõ ràng.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TRANG 3: QUY TẮC BẢO MẬT (FIREBASE SECURITY RULES)                -->
+    <!-- ================================================================= -->
+    <div id="tab3" class="page">
+
+      <!-- 1. Tổng quan về Security Rules -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #fee2e2; color: #dc2626;">🛡️</div>
+          <div>
+            <div>1. Tường Lửa Bảo Mật Phía Máy Chủ (Firebase Security Rules Là Gì?)</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Cơ chế bảo vệ dữ liệu tối thượng
+              chống lại các cuộc tấn công vượt mặt ứng dụng</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.92rem; color: #334155; line-height: 1.7; margin-bottom: 14px;">
+          Nhiều bạn nghĩ rằng: <em>"Trong code ứng dụng Android ta đã phân quyền Admin và Bạn đọc rồi thì cần gì bảo mật
+            trên máy chủ nữa?"</em>.
+          <strong>Đó là một sai lầm rất lớn!</strong> Kẻ xấu hoặc một học sinh am hiểu tin học có thể không dùng App của
+          trường, mà sử dụng các công cụ như <code>Postman</code> hoặc viết mã <code>Python</code> gửi trực tiếp các gói
+          tin chỉnh sửa lên máy chủ Firebase.
+        </p>
+
+        <div class="highlight-tip">
+          💡 <strong>Quy tắc vàng trong kỹ thuật phần mềm:</strong> <em>"Never trust the client" (Tuyệt đối không bao
+            giờ tin tưởng hoàn toàn vào ứng dụng trên máy người dùng)</em>.
+          <strong>Firebase Security Rules</strong> đóng vai trò như một <strong>"Chú bảo vệ nghiêm ngặt đứng gác ở cổng
+            máy chủ Google"</strong>. Bất kể yêu cầu đọc/ghi dữ liệu đến từ đâu, chú bảo vệ này sẽ kiểm tra xem người
+          gửi có đúng quyền hay không trước khi cho phép dữ liệu đi qua!
+        </div>
+      </div>
+
+      <!-- 2. Chia nhỏ từng đoạn quy tắc & Giải thích chi tiết -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #e0f2fe; color: #0284c7;">🔍</div>
+          <div>
+            <div>2. Phân Tích Chi Tiết Từng Đoạn Quy Tắc Bảo Mật (Rule Snippets & Explanations)</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Chia nhỏ từng nút dữ liệu, hiển thị đoạn mã quy tắc tương ứng kèm lời giải thích cặn kẽ</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 26px;">
+
+          <!-- ================= ĐOẠN 1: USERS ================= -->
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="background: #eef2ff; padding: 14px 20px; border-bottom: 1px solid #e0e7ff; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 1.02rem; color: #3730a3; display: flex; align-items: center; gap: 8px;">
+                <span>👤 ĐOẠN 1: BẢNG NGƯỜI DÙNG (<code>/users</code>)</span>
+              </div>
+              <span style="background: #e0e7ff; color: #4338ca; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">CHỐNG LEO THANG ĐẶC QUYỀN</span>
+            </div>
+
+            <div style="padding: 20px;">
+              <!-- Code Snippet -->
+              <div class="code-container" style="margin-bottom: 16px;">
+                <div class="code-header">
+                  <span>Quy tắc cho nút /users</span>
+                  <span>JSON</span>
+                </div>
+                <div class="code-body"><span class="string">"users"</span>: <span class="keyword">{</span>
+  <span class="comment">// 1. Đọc toàn bộ danh sách người dùng: Chỉ ADMIN</span>
+  <span class="string">".read"</span>: <span class="string">"auth != null && root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"</span>,
+
+  <span class="string">"$uid"</span>: <span class="keyword">{</span>
+    <span class="comment">// 2. Đọc hồ sơ cá nhân: Chính chủ ($uid) hoặc ADMIN</span>
+    <span class="string">".read"</span>: <span class="string">"auth != null && (
+      auth.uid === $uid ||
+      root.child('users').child(auth.uid).child('role').val() === 'ADMIN'
+    )"</span>,
+
+    <span class="comment">// 3. Sửa hồ sơ: ADMIN toàn quyền; Chính chủ ($uid) sửa được nhưng CẤM đổi role</span>
+    <span class="string">".write"</span>: <span class="string">"auth != null && (
+      root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+      (
+        auth.uid === $uid &&
+        newData.child('role').val() === data.child('role').val()
+      )
+    )"</span>
+  <span class="keyword">}</span>
+<span class="keyword">}</span></div>
+              </div>
+
+              <!-- Giải thích chi tiết -->
+              <div style="font-size: 0.9rem; color: #334155; line-height: 1.7;">
+                <p style="margin-bottom: 8px;"><strong>🔍 Giải thích chi tiết từng dòng lệnh:</strong></p>
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    <code>.read tại gốc /users</code>: Yêu cầu bắt buộc <code>auth != null</code> (đã đăng nhập) và phải có <code>role === 'ADMIN'</code>. Chỉ có Thủ thư / Ban giám hiệu mới được tải danh sách toàn bộ học sinh trong trường. Học sinh bình thường bị từ chối ngay lập tức.
+                  </li>
+                  <li>
+                    <code>$uid / .read</code>: Khi truy cập vào từng tài khoản cụ thể, điều kiện <code>auth.uid === $uid</code> đảm bảo học sinh A chỉ đọc được hồ sơ của chính mình (tên, email, vai trò), hoàn toàn không thể xem lén thông tin của bạn B.
+                  </li>
+                  <li>
+                    <code>$uid / .write (Kỹ thuật then chốt)</code>: Học sinh được phép cập nhật thông tin cá nhân của mình (ví dụ sửa họ tên hiển thị), NHƯNG có chốt chặn an ninh:
+                    <br><code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-weight: 700; color: #1e293b;">newData.child('role').val() === data.child('role').val()</code>
+                    <br>Nghĩa là: <em>Vai trò mới gửi lên bắt buộc phải trùng khớp với vai trò cũ đã lưu</em>. Kẻ xấu dù có dùng công cụ bên ngoài cố tình gửi gói tin đổi chữ <code>"USER"</code> thành <code>"ADMIN"</code> thì máy chủ Google cũng sẽ chặn lại và báo lỗi quyền truy cập!
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ĐOẠN 2: BOOKS ================= -->
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="background: #f0fdf4; padding: 14px 20px; border-bottom: 1px solid #bbf7d0; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 1.02rem; color: #166534; display: flex; align-items: center; gap: 8px;">
+                <span>📖 ĐOẠN 2: KHO SÁCH THƯ VIỆN (<code>/books</code>)</span>
+              </div>
+              <span style="background: #dcfce7; color: #15803d; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">BẢO TOÀN DỮ LIỆU & ĐÁNH CHỈ MỤC</span>
+            </div>
+
+            <div style="padding: 20px;">
+              <!-- Code Snippet -->
+              <div class="code-container" style="margin-bottom: 16px;">
+                <div class="code-header">
+                  <span>Quy tắc cho nút /books</span>
+                  <span>JSON</span>
+                </div>
+                <div class="code-body"><span class="string">"books"</span>: <span class="keyword">{</span>
+  <span class="comment">// 1. Cho phép mọi người dùng đã đăng nhập xem danh mục sách</span>
+  <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+  <span class="comment">// 2. Đánh chỉ mục vị trí ô tủ để tìm kiếm siêu tốc</span>
+  <span class="string">".indexOn"</span>: <span class="keyword">[</span><span class="string">"slot"</span><span class="keyword">]</span>,
+
+  <span class="string">"$bookId"</span>: <span class="keyword">{</span>
+    <span class="comment">// 3. ADMIN toàn quyền; USER chỉ được đổi DUY NHẤT trường status (AVAILABLE / BORROWED)</span>
+    <span class="string">".write"</span>: <span class="string">"auth != null && (
+      root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+      (
+        data.exists() &&
+        newData.exists() &&
+        newData.child('title').val() === data.child('title').val() &&
+        newData.child('author').val() === data.child('author').val() &&
+        newData.child('category').val() === data.child('category').val() &&
+        newData.child('slot').val() === data.child('slot').val() &&
+        newData.child('id').val() === data.child('id').val() &&
+        (
+          newData.child('status').val() === 'BORROWED' ||
+          newData.child('status').val() === 'AVAILABLE'
+        )
+      )
+    )"</span>
+  <span class="keyword">}</span>
+<span class="keyword">}</span></div>
+              </div>
+
+              <!-- Giải thích chi tiết -->
+              <div style="font-size: 0.9rem; color: #334155; line-height: 1.7;">
+                <p style="margin-bottom: 8px;"><strong>🔍 Giải thích chi tiết từng dòng lệnh:</strong></p>
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    <code>.read: "auth != null"</code>: Bất kỳ độc giả hay học sinh nào đã đăng nhập đều có quyền duyệt xem danh mục kho sách để lựa chọn cuốn sách mình yêu thích.
+                  </li>
+                  <li>
+                    <code>.indexOn: ["slot"]</code>: Thiết lập đánh mục lục tự động cho trường ô tủ (<code>slot</code>). Nhờ có chỉ mục này, khi hệ thống cần tìm kiếm "ô tủ nào đang trống" để thêm sách, máy chủ Google phản hồi ngay lập tức mà không phải duyệt qua toàn bộ kho sách.
+                  </li>
+                  <li>
+                    <code>$bookId / .write (Kỹ thuật bảo toàn dữ liệu - Data Integrity)</code>:
+                    <br>• Thủ thư (<code>ADMIN</code>) có toàn quyền thêm sách mới, sửa chữa thông tin và xóa sách khỏi hệ thống.
+                    <br>• Học sinh (<code>USER</code>) cần quyền ghi để đổi trạng thái sách khi mượn hoặc trả, nhưng quy tắc <strong>khóa chặt 5 trường dữ liệu quan trọng</strong>:
+                    <br>&nbsp;&nbsp;+ <code>data.exists() && newData.exists()</code>: Cuốn sách phải có sẵn, học sinh không được tự tạo thêm sách rác và cấm xóa sách.
+                    <br>&nbsp;&nbsp;+ Cấm sửa: Tên sách (<code>title</code>), Tác giả (<code>author</code>), Thể loại (<code>category</code>), Vị trí ô tủ (<code>slot</code>), và Mã sách (<code>id</code>).
+                    <br>&nbsp;&nbsp;+ <code>newData.child('status').val() === 'BORROWED' || 'AVAILABLE'</code>: Học sinh <strong>chỉ được phép sửa duy nhất trường trạng thái</strong> từ "Có sẵn" sang "Đã mượn" hoặc ngược lại.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ĐOẠN 3: SCAN_EVENT ================= -->
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="background: #fefce8; padding: 14px 20px; border-bottom: 1px solid #fef08a; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 1.02rem; color: #854d0e; display: flex; align-items: center; gap: 8px;">
+                <span>📷 ĐOẠN 3: KÊNH MÁY QUÉT MÃ VẠCH (<code>/scan_event</code>)</span>
+              </div>
+              <span style="background: #fef9c3; color: #a16207; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">HỘP THƯ TRUYỀN TIN TỨC THỜI</span>
+            </div>
+
+            <div style="padding: 20px;">
+              <!-- Code Snippet -->
+              <div class="code-container" style="margin-bottom: 16px;">
+                <div class="code-header">
+                  <span>Quy tắc cho nút /scan_event</span>
+                  <span>JSON</span>
+                </div>
+                <div class="code-body"><span class="string">"scan_event"</span>: <span class="keyword">{</span>
+  <span class="comment">// Mở quyền Đọc và Ghi cho tất cả người dùng / thiết bị đã xác thực</span>
+  <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+  <span class="string">".write"</span>: <span class="string">"auth != null"</span>
+<span class="keyword">}</span></div>
+              </div>
+
+              <!-- Giải thích chi tiết -->
+              <div style="font-size: 0.9rem; color: #334155; line-height: 1.7;">
+                <p style="margin-bottom: 8px;"><strong>🔍 Giải thích chi tiết cơ chế hoạt động:</strong></p>
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    <code>auth != null</code>: Mở quyền Đọc/Ghi cho mọi bên tham gia hệ thống sau khi đã đăng nhập (cả ứng dụng Android và đầu đọc mã vạch vật lý).
+                  </li>
+                  <li>
+                    <strong>Vai trò Event Broker (Cầu nối sự kiện):</strong> Nút <code>/scan_event</code> không dùng để lưu trữ dữ liệu vĩnh viễn, mà hoạt động như một kênh phát tín hiệu không dây tức thì:
+                    <br>1. Khi học sinh đưa sách vào máy quét ngoài đời, đầu đọc phần cứng tít một tiếng và lập tức ghi mã vạch vào <code>/scan_event/code</code>.
+                    <br>2. Ứng dụng Android trên tay học sinh đang mở tai nghe (<code>DisposableEffect</code>) bắt được mã vạch này ngay lập tức để tự động điền vào màn hình trả sách.
+                    <br>3. Xác nhận xong, ứng dụng tự động xóa trắng mã quét để sẵn sàng cho lần trả sách tiếp theo.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ĐOẠN 4: STATIONS ================= -->
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="background: #fdf2f8; padding: 14px 20px; border-bottom: 1px solid #fbcfe8; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 1.02rem; color: #9d174d; display: flex; align-items: center; gap: 8px;">
+                <span>🤖 ĐOẠN 4: KÊNH GIAO TIẾP MÁY TRẠM ROBOT IOT (<code>/stations</code>)</span>
+              </div>
+              <span style="background: #fce7f3; color: #be185d; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">ĐIỀU KHIỂN PHẦN CỨNG 2 CHIỀU</span>
+            </div>
+
+            <div style="padding: 20px;">
+              <!-- Code Snippet -->
+              <div class="code-container" style="margin-bottom: 16px;">
+                <div class="code-header">
+                  <span>Quy tắc cho nút /stations</span>
+                  <span>JSON</span>
+                </div>
+                <div class="code-body"><span class="string">"stations"</span>: <span class="keyword">{</span>
+  <span class="comment">// Mở quyền Đọc và Ghi để App và Vi điều khiển trao đổi lệnh</span>
+  <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+  <span class="string">".write"</span>: <span class="string">"auth != null"</span>
+<span class="keyword">}</span></div>
+              </div>
+
+              <!-- Giải thích chi tiết -->
+              <div style="font-size: 0.9rem; color: #334155; line-height: 1.7;">
+                <p style="margin-bottom: 8px;"><strong>🔍 Giải thích chi tiết cơ chế điều khiển phần cứng:</strong></p>
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    <code>auth != null</code>: Cho phép ứng dụng di động và bo mạch điều khiển của trạm máy kết nối đọc/ghi lệnh thời gian thực.
+                  </li>
+                  <li>
+                    <strong>Luồng điều khiển 2 chiều liên tục:</strong>
+                    <br>• <strong>Chiều phát lệnh (Điện thoại ➔ Robot):</strong> Khi bạn đọc bấm Mượn/Trả, App Android gửi gói tin gồm: <code>mode: "BORROW" | "RETURN"</code>, số ô tủ <code>slot</code>, mã <code>currentLoanId</code>, và trạng thái <code>status: "PENDING"</code>.
+                    <br>• <strong>Chiều phản hồi (Robot ➔ Điện thoại):</strong> Bo mạch điều khiển máy trạm đọc được lệnh, kích hoạt động cơ cơ khí mở đúng ô hộc tủ để nhả hoặc nhận sách. Khi hoàn tất, robot cập nhật lại <code>status = "SUCCESS"</code>.
+                    <br>• Ứng dụng điện thoại quan sát thấy chữ <code>SUCCESS</code> mới chính thức chốt giao dịch thành công.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ĐOẠN 5: LOANS ================= -->
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="background: #f8fafc; padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 1.02rem; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                <span>📑 ĐOẠN 5: BẢNG LỊCH SỬ MƯỢN TRẢ (<code>/loans</code>)</span>
+              </div>
+              <span style="background: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">BẢO VỆ QUYỀN RIÊNG TƯ CÁ NHÂN</span>
+            </div>
+
+            <div style="padding: 20px;">
+              <!-- Code Snippet -->
+              <div class="code-container" style="margin-bottom: 16px;">
+                <div class="code-header">
+                  <span>Quy tắc cho nút /loans</span>
+                  <span>JSON</span>
+                </div>
+                <div class="code-body"><span class="string">"loans"</span>: <span class="keyword">{</span>
+  <span class="comment">// 1. Đọc toàn bộ lịch sử trường: Chỉ ADMIN</span>
+  <span class="string">".read"</span>: <span class="string">"auth != null && root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"</span>,
+
+  <span class="string">"$uid"</span>: <span class="keyword">{</span>
+    <span class="comment">// 2. Đọc lịch sử cá nhân: Học sinh chỉ xem của mình ($uid == auth.uid) hoặc ADMIN</span>
+    <span class="string">".read"</span>: <span class="string">"auth != null && (
+      auth.uid === $uid ||
+      root.child('users').child(auth.uid).child('role').val() === 'ADMIN'
+    )"</span>,
+
+    <span class="string">"$loanId"</span>: <span class="keyword">{</span>
+      <span class="comment">// 3. Tạo/Cập nhật phiếu mượn: Chính chủ học sinh tạo phiếu của mình hoặc ADMIN</span>
+      <span class="string">".write"</span>: <span class="string">"auth != null && (
+        root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+        auth.uid === $uid
+      )"</span>
+    <span class="keyword">}</span>
+  <span class="keyword">}</span>
+<span class="keyword">}</span></div>
+              </div>
+
+              <!-- Giải thích chi tiết -->
+              <div style="font-size: 0.9rem; color: #334155; line-height: 1.7;">
+                <p style="margin-bottom: 8px;"><strong>🔍 Giải thích chi tiết từng dòng lệnh:</strong></p>
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    <code>.read tại gốc /loans</code>: Chỉ Quản trị viên (<code>role === 'ADMIN'</code>) mới được cấp quyền đọc toàn bộ dữ liệu tại nút này để phục vụ màn hình <a href="file:///P:/LIBBOT/app/src/main/java/com/example/libbot/AdminLoanHistoryScreen.kt"><code>AdminLoanHistoryScreen.kt</code></a> theo dõi tình hình mượn trả của học sinh toàn trường.
+                  </li>
+                  <li>
+                    <code>$uid / .read</code>: Dữ liệu lịch sử được phân nhánh theo từng học sinh <code>/loans/{uid}</code>. Điều kiện <code>auth.uid === $uid</code> bảo đảm quyền riêng tư tuyệt đối: Học sinh chỉ xem được danh sách mượn sách của bản thân mình trên <a href="file:///P:/LIBBOT/app/src/main/java/com/example/libbot/UserHistoryScreen.kt"><code>UserHistoryScreen.kt</code></a>, không thể xem lén thông tin của người khác.
+                  </li>
+                  <li>
+                    <code>$loanId / .write</code>: Cho phép học sinh tạo phiếu mượn mới và cập nhật ngày giờ trả sách cho chính tài khoản của mình. Học sinh không thể giả mạo để tạo phiếu mượn dưới tên của bạn khác.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. Toàn bộ file cấu hình tổng hợp -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #f1f5f9; color: #0f172a;">📜</div>
+          <div>
+            <div>3. Toàn Bộ Mã Nguồn database.rules.json Đầy Đủ</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">File JSON tổng hợp hoàn chỉnh sẵn sàng copy cấu hình trên Firebase Console</div>
+          </div>
+        </div>
+
+        <details style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; cursor: pointer;">
+          <summary style="font-weight: 700; color: var(--primary); font-size: 0.92rem; outline: none;">
+            ▶ Bấm vào đây để mở / đóng toàn bộ file JSON cấu hình quy tắc
+          </summary>
+          <div class="code-container" style="margin-top: 14px;">
+            <div class="code-header">
+              <span>database.rules.json</span>
+              <span>JSON</span>
+            </div>
+            <div class="code-body"><span class="keyword">{</span>
+  <span class="string">"rules"</span>: <span class="keyword">{</span>
+    <span class="comment">// 1. BẢNG NGƯỜI DÙNG: Quản lý hồ sơ và vai trò</span>
+    <span class="string">"users"</span>: <span class="keyword">{</span>
+      <span class="string">".read"</span>: <span class="string">"auth != null && root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"</span>,
+
+      <span class="string">"$uid"</span>: <span class="keyword">{</span>
+        <span class="string">".read"</span>: <span class="string">"auth != null && (
+          auth.uid === $uid ||
+          root.child('users').child(auth.uid).child('role').val() === 'ADMIN'
+        )"</span>,
+
+        <span class="string">".write"</span>: <span class="string">"auth != null && (
+          root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+          (
+            auth.uid === $uid &&
+            newData.child('role').val() === data.child('role').val()
+          )
+        )"</span>
+      <span class="keyword">}</span>
+    <span class="keyword">}</span>,
+
+    <span class="comment">// 2. KHO SÁCH: Cho phép tìm kiếm và khóa sửa thông tin trái phép</span>
+    <span class="string">"books"</span>: <span class="keyword">{</span>
+      <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+      <span class="string">".indexOn"</span>: <span class="keyword">[</span><span class="string">"slot"</span><span class="keyword">]</span>,
+
+      <span class="string">"$bookId"</span>: <span class="keyword">{</span>
+        <span class="string">".write"</span>: <span class="string">"auth != null && (
+          root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+          (
+            data.exists() &&
+            newData.exists() &&
+            newData.child('title').val() === data.child('title').val() &&
+            newData.child('author').val() === data.child('author').val() &&
+            newData.child('category').val() === data.child('category').val() &&
+            newData.child('slot').val() === data.child('slot').val() &&
+            newData.child('id').val() === data.child('id').val() &&
+            (
+              newData.child('status').val() === 'BORROWED' ||
+              newData.child('status').val() === 'AVAILABLE'
+            )
+          )
+        )"</span>
+      <span class="keyword">}</span>
+    <span class="keyword">}</span>,
+
+    <span class="comment">// 3. KÊNH MÁY QUÉT MÃ VẠCH</span>
+    <span class="string">"scan_event"</span>: <span class="keyword">{</span>
+      <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+      <span class="string">".write"</span>: <span class="string">"auth != null"</span>
+    <span class="keyword">}</span>,
+
+    <span class="comment">// 4. KÊNH GIAO TIẾP MÁY TRẠM ROBOT IOT</span>
+    <span class="string">"stations"</span>: <span class="keyword">{</span>
+      <span class="string">".read"</span>: <span class="string">"auth != null"</span>,
+      <span class="string">".write"</span>: <span class="string">"auth != null"</span>
+    <span class="keyword">}</span>,
+
+    <span class="comment">// 5. BẢNG LỊCH SỬ MƯỢN TRẢ: Bảo mật riêng tư cá nhân</span>
+    <span class="string">"loans"</span>: <span class="keyword">{</span>
+      <span class="string">".read"</span>: <span class="string">"auth != null && root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"</span>,
+
+      <span class="string">"$uid"</span>: <span class="keyword">{</span>
+        <span class="string">".read"</span>: <span class="string">"auth != null && (
+          auth.uid === $uid ||
+          root.child('users').child(auth.uid).child('role').val() === 'ADMIN'
+        )"</span>,
+
+        <span class="string">"$loanId"</span>: <span class="keyword">{</span>
+          <span class="string">".write"</span>: <span class="string">"auth != null && (
+            root.child('users').child(auth.uid).child('role').val() === 'ADMIN' ||
+            auth.uid === $uid
+          )"</span>
+        <span class="keyword">}</span>
+      <span class="keyword">}</span>
+    <span class="keyword">}</span>
+  <span class="keyword">}</span>
+<span class="keyword">}</span></div>
+          </div>
+        </details>
+      </div>
+
+      <!-- 4. Bảng Ma trận Phân quyền Tổng hợp -->
+      <div class="card">
+        <div class="card-title">
+          <div class="icon-box" style="background: #dcfce7; color: #16a34a;">📋</div>
+          <div>
+            <div>4. Ma Trận Quyền Hạn Tổng Hợp (Security Permission Matrix)</div>
+            <div style="font-size: 0.82rem; font-weight: 500; color: var(--gray);">Đối chiếu quyền hạn giữa các đối
+              tượng người dùng trong hệ thống LIBBOT</div>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nút Dữ Liệu (Node)</th>
+              <th>Khách Vãng Lai (Chưa đăng nhập)</th>
+              <th>Học Sinh / Bạn Đọc (USER)</th>
+              <th>Thủ Thư / Quản Trị Viên (ADMIN)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/users</code> (Toàn bộ)</td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>✅ Được Đọc & Quản lý toàn quyền</td>
+            </tr>
+            <tr>
+              <td><code>/users/{uid}</code> (Cá nhân)</td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>✅ Đọc/Sửa thông tin mình (<strong>CẤM đổi role</strong>)</td>
+              <td>✅ Toàn quyền xem và chỉnh sửa</td>
+            </tr>
+            <tr>
+              <td><code>/books</code> (Kho sách)</td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>✅ Được Đọc; ⚠️ <strong>Chỉ được sửa status</strong> mượn/trả</td>
+              <td>✅ Toàn quyền Thêm, Sửa, Xóa sách</td>
+            </tr>
+            <tr>
+              <td><code>/loans/{uid}</code> (Lịch sử)</td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>✅ Chỉ xem và tạo phiếu mượn của chính mình</td>
+              <td>✅ Toàn quyền xem lịch sử của mọi học sinh</td>
+            </tr>
+            <tr>
+              <td><code>/stations</code> & <code>/scan_event</code></td>
+              <td>❌ Cấm hoàn toàn</td>
+              <td>✅ Được Đọc/Ghi để điều khiển mượn trả</td>
+              <td>✅ Được Đọc/Ghi để thêm/xóa sách</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>📐 Bản vẽ kiến trúc kỹ thuật ứng dụng di động <strong>LIBBOT</strong></p>
+    <p style="font-size: 0.8rem; margin-top: 4px;">Biên soạn chuẩn xác theo cấu trúc mã nguồn Android Studio & Firebase
+      Realtime Database</p>
+  </footer>
+
+  <script>
+    let hasRenderedMermaid = false;
+
+    function switchPage(pageId, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById(pageId);
+      target.classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if ((pageId === 'tab2' || pageId === 'tab3') && window.mermaid) {
+        try {
+          mermaid.run();
+        } catch (e) {
+          console.error("Mermaid run error:", e);
+        }
+      }
+    }
+
+    function toggleFlow(headerElement) {
+      const card = headerElement.parentElement;
+      const isOpen = card.classList.contains('open');
+
+      document.querySelectorAll('.flow-card').forEach(c => c.classList.remove('open'));
+
+      if (!isOpen) {
+        card.classList.add('open');
+      }
+    }
+  </script>
+</body>
+
+</html>
